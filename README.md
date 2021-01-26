@@ -1,6 +1,6 @@
 # Todo-List
 
-Building Todo-List App Using Vanilla Javascript
+Build Todo-List App Using Vanilla Javascript
 
 ## Preview
 
