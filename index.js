@@ -3,7 +3,6 @@ const input = document.querySelector(".js-input");
 const pendingUl = document.querySelector(".js-pending-ul");
 const finishedUl = document.querySelector(".js-finished-ul");
 const body = document.body;
-let completeBtn;
 
 let pendingToDos = [];
 let finishedToDos = [];
@@ -28,9 +27,7 @@ function deletePendingToDo(id) {
   pendingToDos = pendingToDos.filter((todo) => todo.id !== id);
 }
 function deleteFinishedToDo(id) {
-  console.log("before finishedToDos", finishedToDos);
   finishedToDos = finishedToDos.filter((todo) => todo.id !== id);
-  console.log("after finishedToDos", finishedToDos);
 }
 
 function deleteToDo(e) {
@@ -61,10 +58,30 @@ function moveToDoToFinished(id) {
   finishedToDos.push(...newToDo);
 }
 
+function revertToDo(id) {
+  const newTodo = finishedToDos.filter((todo) => todo.id === id);
+  finishedToDos = finishedToDos.filter((todo) => todo.id !== id);
+  pendingToDos.push(...newTodo);
+}
+
+// finished => pending
+function handleRevert(e) {
+  const li = e.target.parentNode;
+  const btn = e.target;
+  btn.innerText = "완료";
+  pendingUl.append(li);
+  revertToDo(li.id);
+  saveToStorage(pendingToDos);
+  saveToStorage(finishedToDos);
+}
+
+// pending => finished
 function completeToDo(e) {
   const li = e.target.parentNode;
+  const revertBtn = e.target;
+  revertBtn.innerText = "되돌리기";
   finishedUl.append(li);
-  completeBtn.innerText = "되돌리기";
+  revertBtn.addEventListener("click", handleRevert);
   moveToDoToFinished(li.id);
   saveToStorage(finishedToDos);
   deletePendingToDo(li.id);
@@ -74,11 +91,10 @@ function completeToDo(e) {
 function displayPendingToDo(todo) {
   const li = createLi(todo);
   pendingUl.appendChild(li);
-  completeBtn = document.createElement("button");
+  const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", completeToDo);
   li.append(completeBtn);
-  console.log(li);
 }
 
 function handleSubmit(e) {
