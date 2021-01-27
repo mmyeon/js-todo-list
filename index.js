@@ -3,6 +3,7 @@ const input = document.querySelector(".js-input");
 const pendingUl = document.querySelector(".js-pending-ul");
 const finishedUl = document.querySelector(".js-finished-ul");
 const body = document.body;
+let completeBtn;
 
 let pendingToDos = [];
 let finishedToDos = [];
@@ -38,7 +39,6 @@ function deleteToDo(e) {
 
   deletePendingToDo(li.id);
   saveToStorage(pendingToDos);
-  // TODO: 이부분이 자기 역할을 잘 못하는 듯!
   deleteFinishedToDo(li.id);
   saveToStorage(finishedToDos);
 }
@@ -47,7 +47,7 @@ function createLi(todo) {
   const li = document.createElement("li");
   const span = document.createElement("span");
   const delBtn = document.createElement("button");
-  li.innerText = todo.text;
+  span.innerText = todo.text;
   li.id = todo.id;
   delBtn.innerText = "삭제";
   delBtn.addEventListener("click", deleteToDo);
@@ -64,6 +64,7 @@ function moveToDoToFinished(id) {
 function completeToDo(e) {
   const li = e.target.parentNode;
   finishedUl.append(li);
+  completeBtn.innerText = "되돌리기";
   moveToDoToFinished(li.id);
   saveToStorage(finishedToDos);
   deletePendingToDo(li.id);
@@ -73,7 +74,7 @@ function completeToDo(e) {
 function displayPendingToDo(todo) {
   const li = createLi(todo);
   pendingUl.appendChild(li);
-  const completeBtn = document.createElement("button");
+  completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", completeToDo);
   li.append(completeBtn);
