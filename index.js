@@ -16,7 +16,9 @@ function createToDo(text) {
 }
 
 function saveToStorage(todos) {
-  localStorage.setItem(PENDING, JSON.stringify(todos));
+  todos === pendingToDos
+    ? localStorage.setItem(PENDING, JSON.stringify(todos))
+    : localStorage.setItem(FINISHED, JSON.stringify(todos));
 }
 
 function deletePendingToDo(id) {
@@ -43,9 +45,24 @@ function createLi(todo) {
   return li;
 }
 
+function movePendingToDo(id) {
+  finishiedToDos = pendingToDos.filter((todo) => todo.id === id);
+}
+
+// function completeToDo() {
+//   const li = e.target.parentNode;
+//   li.remove();
+//   movePendingToDo(li.id);
+// }
+
 function displayPendingToDo(todo) {
   const li = createLi(todo);
   pendingUl.appendChild(li);
+  const completeBtn = document.createElement("button");
+  completeBtn.innerText = "완료";
+  // completeBtn.addEventListener("click", completeToDo);
+  li.append(completeBtn);
+  console.log(li);
 }
 
 function handleSubmit(e) {
