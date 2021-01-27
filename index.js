@@ -26,12 +26,21 @@ function saveToStorage(todos) {
 function deletePendingToDo(id) {
   pendingToDos = pendingToDos.filter((todo) => todo.id !== id);
 }
+function deleteFinishedToDo(id) {
+  console.log("before finishedToDos", finishedToDos);
+  finishedToDos = finishedToDos.filter((todo) => todo.id !== id);
+  console.log("after finishedToDos", finishedToDos);
+}
 
 function deleteToDo(e) {
   const li = e.target.parentNode;
   li.remove();
+
   deletePendingToDo(li.id);
   saveToStorage(pendingToDos);
+  // TODO: 이부분이 자기 역할을 잘 못하는 듯!
+  deleteFinishedToDo(li.id);
+  saveToStorage(finishedToDos);
 }
 
 function createLi(todo) {
@@ -48,13 +57,17 @@ function createLi(todo) {
 }
 
 function moveToDoToFinished(id) {
-  finishiedToDos = pendingToDos.filter((todo) => todo.id === id);
-  saveToStorage(finishedToDos);
+  const newToDo = pendingToDos.filter((todo) => todo.id === id);
+  finishedToDos.push(...newToDo);
 }
 
 function completeToDo(e) {
   const li = e.target.parentNode;
   finishedUl.append(li);
+  moveToDoToFinished(li.id);
+  saveToStorage(finishedToDos);
+  deletePendingToDo(li.id);
+  saveToStorage(pendingToDos);
 }
 
 function displayPendingToDo(todo) {
