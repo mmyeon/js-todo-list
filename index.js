@@ -15,6 +15,10 @@ function createToDo(text) {
   };
 }
 
+function saveToStorage(todos) {
+  localStorage.setItem(PENDING, JSON.stringify(todos));
+}
+
 function deletePendingToDo(id) {
   pendingToDos = pendingToDos.filter((todo) => todo.id !== id);
 }
@@ -23,6 +27,7 @@ function deleteToDo(e) {
   const li = e.target.parentNode;
   li.remove();
   deletePendingToDo(li.id);
+  saveToStorage(pendingToDos);
 }
 
 function createLi(todo) {
@@ -50,6 +55,7 @@ function handleSubmit(e) {
   pendingToDos.push(todo);
   input.value = "";
   displayPendingToDo(todo);
+  saveToStorage(pendingToDos);
 }
 
 form.addEventListener("submit", handleSubmit);
