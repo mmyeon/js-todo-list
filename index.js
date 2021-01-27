@@ -1,6 +1,7 @@
 const form = document.querySelector(".js-form");
 const input = document.querySelector(".js-input");
 const pendingUl = document.querySelector(".js-pending-ul");
+const body = document.body;
 
 let pendingToDos = [];
 
@@ -9,21 +10,36 @@ const FINISHED = "FINISHED";
 
 function createToDo(text) {
   return {
-    id: Date.now(),
+    id: String(Date.now()),
     text,
   };
 }
 
-function createLi() {
+function deletePendingToDo(id) {
+  pendingToDos = pendingToDos.filter((todo) => todo.id !== id);
+}
+
+function deleteToDo(e) {
+  const li = e.target.parentNode;
+  li.remove();
+  deletePendingToDo(li.id);
+}
+
+function createLi(todo) {
   const li = document.createElement("li");
+  const span = document.createElement("span");
+  const delBtn = document.createElement("button");
+  li.innerText = todo.text;
+  li.id = todo.id;
+  delBtn.innerText = "삭제";
+  delBtn.addEventListener("click", deleteToDo);
+  li.append(span);
+  li.append(delBtn);
   return li;
 }
 
 function displayPendingToDo(todo) {
-  // 리스트 어펜드하기
-  const li = createLi();
-  li.innerText = todo.text;
-  li.id = todo.id;
+  const li = createLi(todo);
   pendingUl.appendChild(li);
 }
 
