@@ -1,9 +1,11 @@
 const form = document.querySelector(".js-form");
 const input = document.querySelector(".js-input");
 const pendingUl = document.querySelector(".js-pending-ul");
+const finishedUl = document.querySelector(".js-finished-ul");
 const body = document.body;
 
 let pendingToDos = [];
+let finishedToDos = [];
 
 const PENDING = "PENDING";
 const FINISHED = "FINISHED";
@@ -45,22 +47,22 @@ function createLi(todo) {
   return li;
 }
 
-function movePendingToDo(id) {
+function moveToDoToFinished(id) {
   finishiedToDos = pendingToDos.filter((todo) => todo.id === id);
+  saveToStorage(finishedToDos);
 }
 
-// function completeToDo() {
-//   const li = e.target.parentNode;
-//   li.remove();
-//   movePendingToDo(li.id);
-// }
+function completeToDo(e) {
+  const li = e.target.parentNode;
+  finishedUl.append(li);
+}
 
 function displayPendingToDo(todo) {
   const li = createLi(todo);
   pendingUl.appendChild(li);
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
-  // completeBtn.addEventListener("click", completeToDo);
+  completeBtn.addEventListener("click", completeToDo);
   li.append(completeBtn);
   console.log(li);
 }
