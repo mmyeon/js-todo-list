@@ -2,7 +2,6 @@ const form = document.querySelector(".js-form");
 const input = document.querySelector(".js-input");
 const pendingUl = document.querySelector(".js-pending-ul");
 const finishedUl = document.querySelector(".js-finished-ul");
-const body = document.body;
 
 let pendingToDos;
 let finishedToDos;
@@ -26,6 +25,7 @@ function saveToStorage(todos) {
 function deletePendingToDo(id) {
   pendingToDos = pendingToDos.filter((todo) => todo.id !== id);
 }
+
 function deleteFinishedToDo(id) {
   finishedToDos = finishedToDos.filter((todo) => todo.id !== id);
 }
@@ -33,7 +33,6 @@ function deleteFinishedToDo(id) {
 function deleteToDo(e) {
   const li = e.target.parentNode;
   li.remove();
-
   deletePendingToDo(li.id);
   saveToStorage(pendingToDos);
   deleteFinishedToDo(li.id);
@@ -97,6 +96,15 @@ function displayPendingToDo(todo) {
   li.append(completeBtn);
 }
 
+function displayFinishedToDo(todo) {
+  const li = createLi(todo);
+  finishedUl.appendChild(li);
+  const revertBtn = document.createElement("button");
+  revertBtn.innerText = "되돌리기";
+  revertBtn.addEventListener("click", handleRevert);
+  li.append(revertBtn);
+}
+
 function handleSubmit(e) {
   e.preventDefault();
   const text = input.value;
@@ -109,8 +117,10 @@ function handleSubmit(e) {
 
 function loadPendingToDos() {
   pendingToDos = JSON.parse(localStorage.getItem(PENDING)) || [];
+  finishedToDos = JSON.parse(localStorage.getItem(FINISHED)) || [];
 
   pendingToDos.forEach((todo) => displayPendingToDo(todo));
+  finishedToDos.forEach((todo) => displayFinishedToDo(todo));
 }
 
 function init() {
