@@ -4,8 +4,8 @@ const pendingUl = document.querySelector(".js-pending-ul");
 const finishedUl = document.querySelector(".js-finished-ul");
 const body = document.body;
 
-let pendingToDos = [];
-let finishedToDos = [];
+let pendingToDos;
+let finishedToDos;
 
 const PENDING = "PENDING";
 const FINISHED = "FINISHED";
@@ -107,4 +107,15 @@ function handleSubmit(e) {
   saveToStorage(pendingToDos);
 }
 
-form.addEventListener("submit", handleSubmit);
+function loadPendingToDos() {
+  pendingToDos = JSON.parse(localStorage.getItem(PENDING)) || [];
+
+  pendingToDos.forEach((todo) => displayPendingToDo(todo));
+}
+
+function init() {
+  form.addEventListener("submit", handleSubmit);
+  loadPendingToDos();
+}
+
+init();
