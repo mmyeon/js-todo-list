@@ -57,10 +57,10 @@ function moveToDoToFinished(id) {
   finishedToDos.push(...newToDo);
 }
 
-function revertToDo(id) {
-  const newTodo = finishedToDos.filter((todo) => todo.id === id);
+function moveBackToPending(id) {
+  const selectedTodo = finishedToDos.filter((todo) => todo.id === id);
   finishedToDos = finishedToDos.filter((todo) => todo.id !== id);
-  pendingToDos.push(...newTodo);
+  pendingToDos.push(...selectedTodo);
 }
 
 // finished => pending
@@ -69,7 +69,7 @@ function handleRevert(e) {
   const btn = e.target;
   btn.innerText = "완료";
   pendingUl.append(li);
-  revertToDo(li.id);
+  moveBackToPending(li.id);
   saveToStorage(pendingToDos);
   saveToStorage(finishedToDos);
 }
@@ -89,19 +89,19 @@ function completeToDo(e) {
 
 function displayPendingToDo(todo) {
   const li = createLi(todo);
-  pendingUl.appendChild(li);
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", completeToDo);
+  pendingUl.appendChild(li);
   li.append(completeBtn);
 }
 
 function displayFinishedToDo(todo) {
   const li = createLi(todo);
-  finishedUl.appendChild(li);
   const revertBtn = document.createElement("button");
   revertBtn.innerText = "되돌리기";
   revertBtn.addEventListener("click", handleRevert);
+  finishedUl.appendChild(li);
   li.append(revertBtn);
 }
 
