@@ -9,7 +9,7 @@ let finishedToDos;
 const PENDING = "PENDING";
 const FINISHED = "FINISHED";
 
-function createToDo(text) {
+function getObj(text) {
   return {
     id: String(Date.now()),
     text,
@@ -108,7 +108,7 @@ function displayFinishedToDo(todo) {
 function handleSubmit(e) {
   e.preventDefault();
   const text = input.value;
-  const todo = createToDo(text);
+  const todo = getObj(text);
   pendingToDos.push(todo);
   input.value = "";
   displayPendingToDo(todo);
