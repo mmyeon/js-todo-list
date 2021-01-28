@@ -117,15 +117,18 @@ function handleSubmit(e) {
 
 function loadPendingToDos() {
   pendingToDos = JSON.parse(localStorage.getItem(PENDING)) || [];
-  finishedToDos = JSON.parse(localStorage.getItem(FINISHED)) || [];
-
   pendingToDos.forEach((todo) => displayPendingToDo(todo));
+}
+
+function loadFinishedToDos() {
+  finishedToDos = JSON.parse(localStorage.getItem(FINISHED)) || [];
   finishedToDos.forEach((todo) => displayFinishedToDo(todo));
 }
 
 function init() {
   form.addEventListener("submit", handleSubmit);
   loadPendingToDos();
+  loadFinishedToDos();
 }
 
 init();
