@@ -64,11 +64,18 @@ function moveBackToPending(id) {
 }
 
 // finished => pending
-function handleRevert(e) {
+
+function revertToDo(e) {
   const li = e.target.parentNode;
-  const completeBtn = e.target;
+
+  const revertBtn = e.target;
+  revertBtn.remove();
+
+  const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", completeToDo);
+  li.append(completeBtn);
+
   pendingUl.append(li);
   moveBackToPending(li.id);
   saveToStorage(pendingToDos);
@@ -77,13 +84,17 @@ function handleRevert(e) {
 
 // pending => finished
 function completeToDo(e) {
-  console.log("ddd");
   const li = e.target.parentNode;
-  finishedUl.append(li);
-  const revertBtn = e.target;
+
+  const completeBtn = e.target;
+  completeBtn.remove();
+
+  const revertBtn = document.createElement("button");
   revertBtn.innerText = "되돌리기";
-  revertBtn.removeEventListener("click", completeToDo);
-  revertBtn.addEventListener("click", handleRevert);
+  revertBtn.addEventListener("click", revertToDo);
+  li.append(revertBtn);
+
+  finishedUl.append(li);
   moveToDoToFinished(li.id);
   saveToStorage(finishedToDos);
   deletePendingToDo(li.id);
@@ -106,7 +117,7 @@ function displayFinishedToDo(todo) {
   const li = createLi(todo);
   const revertBtn = document.createElement("button");
   revertBtn.innerText = "되돌리기";
-  revertBtn.addEventListener("click", handleRevert);
+  revertBtn.addEventListener("click", revertToDo);
   finishedUl.appendChild(li);
   li.append(revertBtn);
 }
