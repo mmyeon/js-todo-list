@@ -66,8 +66,9 @@ function moveBackToPending(id) {
 // finished => pending
 function handleRevert(e) {
   const li = e.target.parentNode;
-  const btn = e.target;
-  btn.innerText = "완료";
+  const completeBtn = e.target;
+  completeBtn.innerText = "완료";
+  completeBtn.addEventListener("click", completeToDo);
   pendingUl.append(li);
   moveBackToPending(li.id);
   saveToStorage(pendingToDos);
@@ -76,10 +77,12 @@ function handleRevert(e) {
 
 // pending => finished
 function completeToDo(e) {
+  console.log("ddd");
   const li = e.target.parentNode;
+  finishedUl.append(li);
   const revertBtn = e.target;
   revertBtn.innerText = "되돌리기";
-  finishedUl.append(li);
+  revertBtn.removeEventListener("click", completeToDo);
   revertBtn.addEventListener("click", handleRevert);
   moveToDoToFinished(li.id);
   saveToStorage(finishedToDos);
@@ -89,11 +92,14 @@ function completeToDo(e) {
 
 function displayPendingToDo(todo) {
   const li = createLi(todo);
+
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", completeToDo);
-  pendingUl.appendChild(li);
+
   li.append(completeBtn);
+
+  pendingUl.appendChild(li);
 }
 
 function displayFinishedToDo(todo) {
