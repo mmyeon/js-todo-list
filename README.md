@@ -10,5 +10,5 @@ Build Todo-List App Using Vanilla Javascript
 - [x] Todos are saved in local storage.
 - [x] If you did todo, the state is changed from pending to finishied.
 - [x] You can delete todo.
-- [] You can revert todo from finished to pending.
-- [] After page loads, you can get your todos from local storage.
+- [x] You can revert todo from finished to pending.
+- [x] After page loads, you can get your todos from local storage.
