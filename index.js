@@ -18,10 +18,9 @@ function getTaskObject(text) {
   };
 }
 
-function saveToStorage(todos) {
-  todos === pendingTasks
-    ? localStorage.setItem(PENDING, JSON.stringify(todos))
-    : localStorage.setItem(FINISHED, JSON.stringify(todos));
+function saveState() {
+  localStorage.setItem(PENDING, JSON.stringify(pendingTasks));
+  localStorage.setItem(FINISHED, JSON.stringify(finishedTasks));
 }
 
 function deletePendingToDo(id) {
@@ -36,9 +35,8 @@ function deleteToDo(e) {
   const li = e.target.parentNode;
   li.remove();
   deletePendingToDo(li.id);
-  saveToStorage(pendingTasks);
+  saveState();
   deleteFinishedToDo(li.id);
-  saveToStorage(finishedTasks);
 }
 
 function buildGenericLi(todo) {
@@ -78,8 +76,7 @@ function handleBackClick(e) {
 
   pendingList.append(li);
   moveBackToPending(li.id);
-  saveToStorage(pendingTasks);
-  saveToStorage(finishedTasks);
+  saveState();
 }
 
 function handleFinishClick(e) {
@@ -95,9 +92,8 @@ function handleFinishClick(e) {
 
   finishedList.append(li);
   moveToDoToFinished(li.id);
-  saveToStorage(finishedTasks);
   deletePendingToDo(li.id);
-  saveToStorage(pendingTasks);
+  saveState();
 }
 
 function paintPendingTask(task) {
@@ -124,11 +120,11 @@ function paintFinishedTask(todo) {
 function handleSubmit(e) {
   e.preventDefault();
   const text = input.value;
-  const todo = getTaskObject(text);
-  pendingTasks.push(todo);
+  const taskObj = getTaskObject(text);
+  pendingTasks.push(taskObj);
   input.value = "";
-  paintPendingTask(todo);
-  saveToStorage(pendingTasks);
+  paintPendingTask(taskObj);
+  saveState();
 }
 
 function loadState() {
