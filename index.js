@@ -18,98 +18,86 @@ function getTaskObject(text) {
   };
 }
 
-function saveState() {
-  localStorage.setItem(PENDING, JSON.stringify(pendingTasks));
-  localStorage.setItem(FINISHED, JSON.stringify(finishedTasks));
+function savePendingTask(task) {
+  pendingTasks.push(task);
 }
 
-function deletePendingToDo(id) {
-  pendingTasks = pendingTasks.filter((todo) => todo.id !== id);
+function findInPending(taskId) {
+  return pendingTasks.find((task) => task.id === taskId);
 }
 
-function deleteFinishedToDo(id) {
-  finishedTasks = finishedTasks.filter((todo) => todo.id !== id);
+function findInFinished(taskId) {
+  return finishedTasks.find((task) => task.id === taskId);
 }
 
-function deleteToDo(e) {
+function removeFromPending(taskId) {
+  pendingTasks = pendingTasks.filter((task) => task.id !== taskId);
+}
+
+function removeFromFinished(taskId) {
+  finishedTasks = finishedTasks.filter((task) => task.id !== taskId);
+}
+
+function addToFinished(task) {
+  finishedTasks.push(task);
+}
+
+function addToPending(task) {
+  pendingTasks.push(task);
+}
+
+function deleteTask(e) {
   const li = e.target.parentNode;
-  li.remove();
-  deletePendingToDo(li.id);
+  li.parentNode.removeChild(li);
+  removeFromPending(li.id);
+  removeFromFinished(li.id);
   saveState();
-  deleteFinishedToDo(li.id);
 }
 
-function buildGenericLi(todo) {
+function buildGenericLi(task) {
   const li = document.createElement("li");
-  const label = document.createElement("span");
+  const span = document.createElement("span");
   const delBtn = document.createElement("button");
-  label.innerText = todo.text;
-  li.id = todo.id;
+  span.innerText = task.text;
+  li.id = task.id;
   delBtn.innerText = "삭제";
-  delBtn.addEventListener("click", deleteToDo);
-  li.append(label);
-  li.append(delBtn);
+  delBtn.addEventListener("click", deleteTask);
+  li.append(span, delBtn);
   return li;
-}
-
-function moveToDoToFinished(id) {
-  const newToDo = pendingTasks.filter((todo) => todo.id === id);
-  finishedTasks.push(...newToDo);
-}
-
-function moveBackToPending(id) {
-  const selectedTodo = finishedTasks.filter((todo) => todo.id === id);
-  finishedTasks = finishedTasks.filter((todo) => todo.id !== id);
-  pendingTasks.push(...selectedTodo);
 }
 
 function handleBackClick(e) {
   const li = e.target.parentNode;
+  li.parentNode.removeChild(li);
 
-  const revertBtn = e.target;
-  revertBtn.remove();
-
-  const completeBtn = document.createElement("button");
-  completeBtn.innerText = "완료";
-  completeBtn.addEventListener("click", handleFinishClick);
-  li.append(completeBtn);
-
-  pendingList.append(li);
-  moveBackToPending(li.id);
+  const task = findInFinished(li.id);
+  removeFromFinished(li.id);
+  addToPending(task);
+  paintPendingTask(task);
   saveState();
 }
 
 function handleFinishClick(e) {
   const li = e.target.parentNode;
-
-  const completeBtn = e.target;
-  completeBtn.remove();
-
-  const revertBtn = document.createElement("button");
-  revertBtn.innerText = "되돌리기";
-  revertBtn.addEventListener("click", handleBackClick);
-  li.append(revertBtn);
-
-  finishedList.append(li);
-  moveToDoToFinished(li.id);
-  deletePendingToDo(li.id);
+  li.parentNode.removeChild(li);
+  const task = findInPending(li.id);
+  removeFromPending(li.id);
+  addToFinished(task);
+  paintFinishedTask(task);
   saveState();
 }
 
 function paintPendingTask(task) {
   const genericLi = buildGenericLi(task);
-
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
   completeBtn.addEventListener("click", handleFinishClick);
-
   genericLi.append(completeBtn);
-
   pendingList.append(genericLi);
 }
 
-function paintFinishedTask(todo) {
-  const genericLi = buildGenericLi(todo);
+function paintFinishedTask(task) {
+  const genericLi = buildGenericLi(task);
   const backBtn = document.createElement("button");
   backBtn.innerText = "되돌리기";
   backBtn.addEventListener("click", handleBackClick);
@@ -121,10 +109,15 @@ function handleSubmit(e) {
   e.preventDefault();
   const text = input.value;
   const taskObj = getTaskObject(text);
-  pendingTasks.push(taskObj);
   input.value = "";
   paintPendingTask(taskObj);
+  savePendingTask(taskObj);
   saveState();
+}
+
+function saveState() {
+  localStorage.setItem(PENDING, JSON.stringify(pendingTasks));
+  localStorage.setItem(FINISHED, JSON.stringify(finishedTasks));
 }
 
 function loadState() {
