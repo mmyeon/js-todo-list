@@ -1,10 +1,10 @@
 const form = document.querySelector(".js-form");
 const input = document.querySelector(".js-input");
-const pendingUl = document.querySelector(".js-pending-ul");
-const finishedUl = document.querySelector(".js-finished-ul");
+const pendingList = document.querySelector(".js-pending-ul");
+const finishedList = document.querySelector(".js-finished-ul");
 
-let pendingList;
-let finishedList;
+let pendingTasks;
+let finishedTasks;
 
 const PENDING = "PENDING";
 const FINISHED = "FINISHED";
@@ -19,29 +19,29 @@ function getTaskObject(text) {
 }
 
 function saveToStorage(todos) {
-  todos === pendingList
+  todos === pendingTasks
     ? localStorage.setItem(PENDING, JSON.stringify(todos))
     : localStorage.setItem(FINISHED, JSON.stringify(todos));
 }
 
 function deletePendingToDo(id) {
-  pendingList = pendingList.filter((todo) => todo.id !== id);
+  pendingTasks = pendingTasks.filter((todo) => todo.id !== id);
 }
 
 function deleteFinishedToDo(id) {
-  finishedList = finishedList.filter((todo) => todo.id !== id);
+  finishedTasks = finishedTasks.filter((todo) => todo.id !== id);
 }
 
 function deleteToDo(e) {
   const li = e.target.parentNode;
   li.remove();
   deletePendingToDo(li.id);
-  saveToStorage(pendingList);
+  saveToStorage(pendingTasks);
   deleteFinishedToDo(li.id);
-  saveToStorage(finishedList);
+  saveToStorage(finishedTasks);
 }
 
-function createTodoItem(todo) {
+function buildGenericLi(todo) {
   const li = document.createElement("li");
   const label = document.createElement("span");
   const delBtn = document.createElement("button");
@@ -55,19 +55,17 @@ function createTodoItem(todo) {
 }
 
 function moveToDoToFinished(id) {
-  const newToDo = pendingList.filter((todo) => todo.id === id);
-  finishedList.push(...newToDo);
+  const newToDo = pendingTasks.filter((todo) => todo.id === id);
+  finishedTasks.push(...newToDo);
 }
 
 function moveBackToPending(id) {
-  const selectedTodo = finishedList.filter((todo) => todo.id === id);
-  finishedList = finishedList.filter((todo) => todo.id !== id);
-  pendingList.push(...selectedTodo);
+  const selectedTodo = finishedTasks.filter((todo) => todo.id === id);
+  finishedTasks = finishedTasks.filter((todo) => todo.id !== id);
+  pendingTasks.push(...selectedTodo);
 }
 
-// finished => pending
-
-function revertToDo(e) {
+function handleBackClick(e) {
   const li = e.target.parentNode;
 
   const revertBtn = e.target;
@@ -75,17 +73,16 @@ function revertToDo(e) {
 
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
-  completeBtn.addEventListener("click", completeToDo);
+  completeBtn.addEventListener("click", handleFinishClick);
   li.append(completeBtn);
 
-  pendingUl.append(li);
+  pendingList.append(li);
   moveBackToPending(li.id);
-  saveToStorage(pendingList);
-  saveToStorage(finishedList);
+  saveToStorage(pendingTasks);
+  saveToStorage(finishedTasks);
 }
 
-// pending => finished
-function completeToDo(e) {
+function handleFinishClick(e) {
   const li = e.target.parentNode;
 
   const completeBtn = e.target;
@@ -93,63 +90,59 @@ function completeToDo(e) {
 
   const revertBtn = document.createElement("button");
   revertBtn.innerText = "되돌리기";
-  revertBtn.addEventListener("click", revertToDo);
+  revertBtn.addEventListener("click", handleBackClick);
   li.append(revertBtn);
 
-  finishedUl.append(li);
+  finishedList.append(li);
   moveToDoToFinished(li.id);
-  saveToStorage(finishedList);
+  saveToStorage(finishedTasks);
   deletePendingToDo(li.id);
-  saveToStorage(pendingList);
+  saveToStorage(pendingTasks);
 }
 
-function displayPendingToDo(todo) {
-  const todoItem = createTodoItem(todo);
+function paintPendingTask(task) {
+  const genericLi = buildGenericLi(task);
 
   const completeBtn = document.createElement("button");
   completeBtn.innerText = "완료";
-  completeBtn.addEventListener("click", completeToDo);
+  completeBtn.addEventListener("click", handleFinishClick);
 
-  todoItem.append(completeBtn);
+  genericLi.append(completeBtn);
 
-  pendingUl.appendChild(li);
+  pendingList.append(genericLi);
 }
 
-function displayFinishedToDo(todo) {
-  const li = createTodoItem(todo);
-  const revertBtn = document.createElement("button");
-  revertBtn.innerText = "되돌리기";
-  revertBtn.addEventListener("click", revertToDo);
-  finishedUl.appendChild(li);
-  li.append(revertBtn);
+function paintFinishedTask(todo) {
+  const genericLi = buildGenericLi(todo);
+  const backBtn = document.createElement("button");
+  backBtn.innerText = "되돌리기";
+  backBtn.addEventListener("click", handleBackClick);
+  genericLi.append(backBtn);
+  finishedList.append(genericLi);
 }
 
 function handleSubmit(e) {
   e.preventDefault();
   const text = input.value;
   const todo = getTaskObject(text);
-  pendingList.push(todo);
+  pendingTasks.push(todo);
   input.value = "";
-  displayPendingToDo(todo);
-  saveToStorage(pendingList);
+  paintPendingTask(todo);
+  saveToStorage(pendingTasks);
 }
 
 function loadState() {
-  pendingList = JSON.parse(localStorage.getItem(PENDING)) || [];
-  finishedList = JSON.parse(localStorage.getItem(FINISHED)) || [];
+  pendingTasks = JSON.parse(localStorage.getItem(PENDING)) || [];
+  finishedTasks = JSON.parse(localStorage.getItem(FINISHED)) || [];
 }
 
 function restoreState() {
-  pendingList.forEach((todo) => displayPendingToDo(todo));
-  finishedList.forEach((todo) => displayFinishedToDo(todo));
+  pendingTasks.forEach((task) => paintPendingTask(task));
+  finishedTasks.forEach((task) => paintFinishedTask(task));
 }
 
 function init() {
   form.addEventListener("submit", handleSubmit);
   loadState();
   restoreState();
-}
-
-function getPendionList() {
-  return JSON.parse(localStorage.getItem(PENDING)) || [];
 }
